@@ -1,6 +1,8 @@
 #!/bin/bash
 
 GIT_CMD=/usr/bin/git
+GIT_USER=a
+GIT_PWD=a
 
 OLD_PWD=`pwd`
 REPO_DIR=$OLD_PWD/db/repos/$1
@@ -11,7 +13,7 @@ if [ ! -d "$REPO_DIR" ]; then
     mkdir -p $REPO_DIR
     cd $REPO_DIR
     $GIT_CMD init
-    $GIT_CMD remote add origin https://github.com/$1.git
+    $GIT_CMD remote add origin https://$GIT_USER:$GIT_PWD@github.com/$1.git
     $GIT_CMD fetch
 else
     cd $REPO_DIR

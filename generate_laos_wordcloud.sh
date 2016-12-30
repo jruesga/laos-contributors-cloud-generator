@@ -57,7 +57,7 @@ if [ -z "$1" ]; then
     mkdir -p $STATS_DIR
     wget -O $PROJECTS_LIST https://review.lineageos.org/projects/?p=LineageOS%2F \
         && perl -i -pe  's/%2F/\//g' $PROJECTS_LIST \
-        && grep "\"id\":" $PROJECTS_LIST | awk -F"\"" '{print $4}' | grep -v "LineageOS\/\.\|LineageOS\/LineageOS\|CMStatsServer\|m7wls\|hltecan\|hltexx\|v2wifixx\|lotus\|v909\|Focal\|svox\|derp\|ctso_supplicant" > $PROJECTS_LIST_TMP \
+        && grep "\"id\":" $PROJECTS_LIST | awk -F"\"" '{print $4}' | grep -v "LineageOS\/\.\|LineageOS\/LineageOS\|android_device_qcom_msm8996\|android_kernel_qcom_msm8996\|android_packages_apps_Recorder\|android_packages_services_PartnerInterfaceService\|android_packages_themes_Template\|android_vendor_gello\|android_vendor_qcom_opensource_location\|snapdragon_swe_engine" > $PROJECTS_LIST_TMP \
         && mv $PROJECTS_LIST_TMP $PROJECTS_LIST \
         && rm $PROJECTS_LIST.bak
     cat $PROJECTS_LIST | xargs --max-procs=$MAXJOBS -I % ./repo_fetch.sh %

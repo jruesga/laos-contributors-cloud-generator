@@ -35,6 +35,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -49,6 +51,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 
 public class CloudGenerator {
@@ -76,8 +85,8 @@ public class CloudGenerator {
     private static final String CLOUD_BG_PNG = ROOT_DIR + "resources/lineageos.png";
     private static final String CLOUD_FONT = ROOT_DIR + "resources/Roboto-Bold.ttf";
     private static final String LAST_CLOUD_SIZE = ROOT_DIR + "db/last_cloud_size.txt";
-    private static final int DEFAULT_CLOUD_SIZE = 1920;
-    private static final int DEFAULT_CLOUD_INCREMENT = 4;
+    private static final int DEFAULT_CLOUD_SIZE = 1700;
+    private static final int DEFAULT_CLOUD_INCREMENT = 32;
 
     private static int wellKnownAccounts;
 
@@ -89,9 +98,40 @@ public class CloudGenerator {
         public List<String> emails = new ArrayList<>();
     }
 
+    private static void initializeSSL() {
+        TrustManager[] trustAllCerts = new TrustManager[] { 
+            new X509TrustManager() {     
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() { 
+                    return new X509Certificate[0];
+                } 
+                public void checkClientTrusted( 
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                    } 
+                public void checkServerTrusted( 
+                    java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            } 
+        }; 
+
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL"); 
+            sc.init(null, trustAllCerts, new java.security.SecureRandom()); 
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (GeneralSecurityException e) {
+        } 
+    }
+
     public static void main(String[] args) throws Exception {
         boolean FROM_GERRIT = true;
         boolean closed = false;
+
+        initializeSSL();
 
         new File(DB_NAME).delete();
         new File(CLOUD_DB_FILE).delete();
