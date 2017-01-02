@@ -772,7 +772,7 @@ public class CloudGenerator {
                 String name = o.optString("name");
                 if (name != null) name = cleanup(name);
                 if (!isLegalName(name)) {
-                    name = null;
+                    name = username;
                 }
                 String email = o.optString("email");
                 if (email != null) email = cleanup(email);
